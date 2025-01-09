@@ -283,6 +283,7 @@ body {
 
 .team-section {
 	margin-top: 1rem;
+	width: 100%;
 }
 
 .team-section h3 {
@@ -296,6 +297,7 @@ body {
 	flex-wrap: wrap;
 	gap: 1.5rem;
 	justify-content: center;
+	width: 100%;
 }
 
 .team-member {
@@ -555,6 +557,7 @@ body {
 	}
 	.btn-buy {
 		padding: 0.6rem 1.2rem;
+		margin-bottom: 1rem;
 		font-size: 0.9rem;
 	}
 	.produkty-list {
@@ -601,6 +604,66 @@ body {
 	body {
 		overflow-y: auto; /* Enable vertical scrolling on mobile */
 	}
+	.navbar {
+		padding: 1rem;
+	}
+	.navbar-brand {
+		font-size: 1.2rem;
+	}
+	.navbar-links {
+		background-color: rgba(98, 0, 234, 0.95);
+
+		padding: 1rem;
+	}
+
+	.navbar-links a {
+		font-size: 1.2rem;
+		padding: 0.8rem;
+		width: 100%;
+		text-align: center;
+	}
+	.hero h1 {
+		font-size: 2rem;
+		padding: 0 1rem;
+	}
+
+	.produkt {
+		width: 100%;
+		margin: 0.5rem 0;
+	}
+
+	.produkty-list {
+		width: 90%;
+		padding: 0 1rem;
+	}
+
+	.onas-content {
+		padding: 1rem;
+	}
+	#kontakt .contact-form {
+		width: 90%;
+		padding: 0 1rem;
+	}
+
+	body {
+		-webkit-tap-highlight-color: transparent;
+		touch-action: manipulation;
+	}
+}
+@media (max-width: 480px) {
+	.hero h1 {
+		font-size: 1.5rem;
+	}
+
+	.btn-buy {
+		width: 100%;
+		max-width: 200px;
+	}
+
+	.team-member {
+		width: 100%;
+		margin: 0.5rem 0;
+	}
 }
 /* Handle Touch Events for Scrolling */
 @media (hover: none) and (pointer: coarse) {
@@ -612,4 +675,29 @@ body {
 .contact-form label i,
 .btn-submit i {
 	font-size: 1.2rem;
+}
+@media (max-width: 768px) {
+	.hero,
+	.container,
+	#onas,
+	#kontakt,
+	#produkty {
+		height: auto;
+		min-height: fit-content;
+		padding: 2rem 1rem;
+	}
+	body {
+		overflow-y: auto;
+		height: auto;
+		min-height: 100%;
+	}
+	.left-section {
+		height: auto;
+		min-height: fit-content;
+	}
+
+	#nas-tym {
+		height: auto;
+		min-height: fit-content;
+	}
 }

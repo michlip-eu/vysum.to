@@ -2,6 +2,8 @@ body {
 	margin: 0;
 	font-family: sans-serif;
 	background-color: #fafafa;
+    touch-action: manipulation;
+    -webkit-overflow-scrolling: touch;
 }
 
 .navbar {
@@ -45,4 +47,32 @@ body {
 .left-section {
 	background: none;
 	height: 100vh;
+}
+
+* {
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .left-section,
+    .center-section,
+    .right-section {
+        width: 100%;
+        padding: 0.5rem;
+    }
+    
+    .left-section {
+        height: auto;
+        min-height: fit-content;
+    }
+
+    body {
+        height: auto;
+        min-height: 100%;
+    }
 }
