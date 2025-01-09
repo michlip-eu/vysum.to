@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import './App.css';
 import Sumivka1 from './assets/sumivka1.png';
 import Sumivka2 from './assets/sumivka2.png';
