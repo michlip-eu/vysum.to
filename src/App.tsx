@@ -15,6 +15,8 @@ function App() {
 
     useEffect(() => {
         const handleScroll = (event: WheelEvent | TouchEvent) => {
+            const isDesktop = window.innerWidth > 768;
+            if (!isDesktop) return;
             event.preventDefault();
             let delta = 0;
 
@@ -41,17 +43,14 @@ function App() {
             sectionsRef.current[targetIndex]?.scrollIntoView({ behavior: 'smooth' });
         };
 
-        const isDesktop = window.innerWidth > 768;
-        if (isDesktop) {
-            window.addEventListener('wheel', handleScroll, { passive: false });
-            window.addEventListener('touchstart', handleScroll, { passive: false });
-        }
+
+        window.addEventListener('wheel', handleScroll, { passive: false });
+        window.addEventListener('touchstart', handleScroll, { passive: false });
 
         return () => {
-            if (isDesktop) {
-                window.removeEventListener('wheel', handleScroll);
-                window.removeEventListener('touchstart', handleScroll);
-            }
+
+            window.removeEventListener('wheel', handleScroll);
+            window.removeEventListener('touchstart', handleScroll);
         };
     }, []);
 
