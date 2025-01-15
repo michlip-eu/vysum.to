@@ -12,8 +12,6 @@ COPY frontend/index.html ./
 COPY frontend/tsconfig.json ./
 COPY frontend/tsconfig.app.json ./
 COPY frontend/vite.config.ts ./
-COPY frontend/tailwind.config.js ./
-COPY frontend/postcss.config.js ./
 COPY frontend/tsconfig.node.json ./
 
 RUN npm run build
