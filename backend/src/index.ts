@@ -3,7 +3,7 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import db from './services/database.s';
-import { CartModel, UsersModel } from './modelx/users.m';
+import { CartModel, UsersModel } from './models/users.m';
 import jwt from './services/jwt.s';
 import dotenv from 'dotenv';
 import { AuthMiddleWare } from './services/auth.middle.s';
@@ -15,7 +15,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-app.post('/api/user/register', async (req, res) => {
+app.post('/api/user/register', async (req: any, res: any) => {
     const { username, password } = req.body;
     if (!username || !password) {
         res.status(400).send('Username and password are required');
@@ -40,7 +40,7 @@ app.post('/api/user/register', async (req, res) => {
     res.send('User registered');
 });
 
-app.post('/api/user/login', async (req, res) => {
+app.post('/api/user/login', async (req: any, res: any) => {
     const { username, password } = req.body;
     if (!username || !password) {
         res.status(400).send('Username and password are required');
@@ -67,22 +67,20 @@ app.post('/api/user/login', async (req, res) => {
     res.send('Logged in');
 });
 
-app.get('/api/user/logout', async (req, res) => {
+app.get('/api/user/logout', async (req: any, res: any) => {
     res.clearCookie('Authorization');
     res.send('Logged out');
 });
 
-app.get('/api/user/data', AuthMiddleWare, async (req, res) => {
-    //@ts-expect-error data is added by middleware
+app.get('/api/user/data', AuthMiddleWare, async (req: any, res: any) => {
     const user = req.data.user as UsersModel;
-    //@ts-expect-error types are correct
-    const cart: CartModel[] = await db.getConnection().then((conn) => {
+    const cart: any[] = await db.getConnection().then((conn) => {
         return conn.query('SELECT i.name, i.image, i.description, i.price FROM cart c JOIN products i ON c.item_id = i.id WHERE c.user_id = ?', [user.id]);
     }).then((result) => {
         return result[0];
     }).catch(() => {
         return [];
-    });
+    }) as any[]
     const items = cart.map((cartItem) => {
         return {
             ...cartItem,
@@ -98,8 +96,7 @@ app.get('/api/user/data', AuthMiddleWare, async (req, res) => {
     });
 });
 
-app.get('/api/user/cart/add', AuthMiddleWare, async (req, res) => {
-    //@ts-expect-error data is added by middleware
+app.get('/api/user/cart/add', AuthMiddleWare, async (req: any, res: any) => {
     const user = req.data.user as UsersModel;
     const { item_id } = req.query;
     if (!item_id) {
@@ -111,8 +108,7 @@ app.get('/api/user/cart/add', AuthMiddleWare, async (req, res) => {
     res.send('Item added to cart');
 });
 
-app.get('/api/user/cart/remove', AuthMiddleWare, async (req, res) => {
-    //@ts-expect-error data is added by middleware
+app.get('/api/user/cart/remove', AuthMiddleWare, async (req: any, res: any) => {
     const user = req.data.user as UsersModel;
     const { item_id } = req.query;
     if (!item_id) {
@@ -124,15 +120,14 @@ app.get('/api/user/cart/remove', AuthMiddleWare, async (req, res) => {
     res.send('Item removed from cart');
 });
 
-app.get('/api/user/cart/clear', AuthMiddleWare, async (req, res) => {
-    //@ts-expect-error data is added by middleware
+app.get('/api/user/cart/clear', AuthMiddleWare, async (req: any, res: any) => {
     const user = req.data.user as UsersModel;
     const conn = await db.getConnection();
     await conn.query('DELETE FROM cart WHERE user_id = ?', [user.id]);
     res.send('Cart cleared');
 });
 
-app.get('/api/products', async (req, res) => {
+app.get('/api/products', async (req: any, res: any) => {
     const conn = await db.getConnection();
     const items = await conn.query('SELECT * FROM products').then((result) => {
         return result[0] as CartModel[];
@@ -142,8 +137,7 @@ app.get('/api/products', async (req, res) => {
     res.send(items);
 });
 
-app.get('/api/admin/users', AuthMiddleWare, async (req, res) => {
-    //@ts-expect-error data is added by middleware
+app.get('/api/admin/users', AuthMiddleWare, async (req: any, res: any) => {
     const user = req.data.user as UsersModel;
     if (user.role !== 'admin') {
         res.status(403).send('Forbidden');
@@ -158,8 +152,7 @@ app.get('/api/admin/users', AuthMiddleWare, async (req, res) => {
     res.send(users);
 });
 
-app.post('/api/admin/user/:id/promote', AuthMiddleWare, async (req, res) => {
-    //@ts-expect-error data is added by middleware
+app.post('/api/admin/user/:id/promote', AuthMiddleWare, async (req: any, res: any) => {
     const user = req.data.user as UsersModel;
     if (user.role !== 'admin') {
         res.status(403).send('Forbidden');
@@ -175,8 +168,7 @@ app.post('/api/admin/user/:id/promote', AuthMiddleWare, async (req, res) => {
     res.send('User promoted');
 });
 
-app.post('/api/admin/user/:id/demote', AuthMiddleWare, async (req, res) => {
-    //@ts-expect-error data is added by middleware
+app.post('/api/admin/user/:id/demote', AuthMiddleWare, async (req: any, res: any) => {
     const user = req.data.user as UsersModel;
     if (user.role !== 'admin') {
         res.status(403).send('Forbidden');
@@ -192,8 +184,7 @@ app.post('/api/admin/user/:id/demote', AuthMiddleWare, async (req, res) => {
     res.send('User demoted');
 });
 
-app.get('/api/admin/user/:id/delete', AuthMiddleWare, async (req, res) => {
-    //@ts-expect-error data is added by middleware
+app.get('/api/admin/user/:id/delete', AuthMiddleWare, async (req: any, res: any) => {
     const user = req.data.user as UsersModel;
     if (user.role !== 'admin') {
         res.status(403).send('Forbidden');
@@ -209,8 +200,7 @@ app.get('/api/admin/user/:id/delete', AuthMiddleWare, async (req, res) => {
     res.send('User deleted');
 });
 
-app.post('/api/admin/products', AuthMiddleWare, async (req, res) => {
-    //@ts-expect-error data is added by middleware
+app.post('/api/admin/products', AuthMiddleWare, async (req: any, res: any) => {
     const user = req.data.user as UsersModel;
     if (user.role !== 'admin') {
         res.status(403).send('Forbidden');
@@ -226,8 +216,7 @@ app.post('/api/admin/products', AuthMiddleWare, async (req, res) => {
     res.send('Product added');
 });
 
-app.patch('/api/admin/product/:id', AuthMiddleWare, async (req, res) => {
-    //@ts-expect-error data is added by middleware
+app.patch('/api/admin/product/:id', AuthMiddleWare, async (req: any, res: any) => {
     const user = req.data.user as UsersModel;
     if (user.role !== 'admin') {
         res.status(403).send('Forbidden');
@@ -244,8 +233,7 @@ app.patch('/api/admin/product/:id', AuthMiddleWare, async (req, res) => {
     res.send('Product updated');
 });
 
-app.delete('/api/admin/product/:id', AuthMiddleWare, async (req, res) => {
-    //@ts-expect-error data is added by middleware
+app.delete('/api/admin/product/:id', AuthMiddleWare, async (req: any, res: any) => {
     const user = req.data.user as UsersModel;
     if (user.role !== 'admin') {
         res.status(403).send('Forbidden');
