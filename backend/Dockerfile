@@ -3,6 +3,7 @@ FROM node:alpine as build
 WORKDIR /app
 
 COPY backend/package.json ./
+COPY backend/tsconfig.json ./
 
 RUN npm install
 
