@@ -69,7 +69,7 @@ function App() {
                         <li><a href="#onas" onClick={() => setMenuOpen(false)}><i className="fas fa-info-circle"></i> O nás</a></li>
                         <li><a href="#nas-tym" onClick={() => setMenuOpen(false)}><i className="fas fa-users"></i> Náš Tým</a></li>
                         <li><a href="#kontakt" onClick={() => setMenuOpen(false)}><i className="fas fa-envelope"></i> Kontakt</a></li>
-                        <li><a href="#admin-login" onClick={() => setMenuOpen(false)}><i className="fas fa-user-shield"></i> Admin login</a></li>
+                        <li><a href="#login" onClick={() => setMenuOpen(false)}><i className="fas fa-user-shield"></i>Přihlásit se</a></li>
                     </div>
                     <div className="hamburger" onClick={toggleMenu}>
                         <span className="bar"></span>

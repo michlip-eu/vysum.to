@@ -7,34 +7,60 @@ on:
 permissions: write-all
 
 jobs:
-  build-and-deploy:
+  frontend:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
         with:
-          node-version: '18'
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build
-        run: npm run build
-
-      - name: Configure GitHub Pages routing
+          # Build and push Docker image
+      - name: Build and Push Docker Image to GHCR
         run: |
-          cd dist
-          cp index.html 404.html
-          echo '{ "rewrites": [{ "source": "/**", "destination": "/index.html" }] }' > vercel.json
-          touch .nojekyll
+          docker build -t ghcr.io/${{ github.repository }}:frontend . --file frontend/Dockerfile
+          docker push ghcr.io/${{ github.repository }}:frontend
+  backend:
+    runs-on: ubuntu-latest
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: dist
-          enable_jekyll: false
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+          # Build and push Docker image
+      - name: Build and Push Docker Image to GHCR
+        run: |
+          docker build -t ghcr.io/${{ github.repository }}:backend . --file backend/Dockerfile
+          docker push ghcr.io/${{ github.repository }}:backend
+  proxy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+          # Build and push Docker image
+      - name: Build and Push Docker Image to GHCR
+        run: |
+          docker build -t ghcr.io/${{ github.repository }}:proxy .
+          docker push ghcr.io/${{ github.repository }}:proxy

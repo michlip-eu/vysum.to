@@ -1,0 +1,40 @@
+services:
+  nginx:
+    image: ghcr.io/michlip-eu/vysum.to/frontend:proxy
+    ports:
+      - '80:80'
+  frontend:
+    deploy:
+      replicas: 2
+    restart: always
+    image: ghcr.io/michlip-eu/vysum.to/frontend:latest
+  backend:
+    deploy:
+      replicas: 2
+    restart: always
+    image: ghcr.io/michlip-eu/vysum.to/backend:latest
+  database:
+    deploy:
+      replicas: 1
+    restart: always
+    image: mariadb:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: vysum
+      MYSQL_USER: vysum
+      MYSQL_PASSWORD: example
+    ports:
+      - 3306:3306
+    volumes:
+      - vysum-data:/var/lib/mysql
+  watchtower:
+    image: containrrr/watchtower
+    volumes:
+      - $HOME/.docker/config.json/:/config.json
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 30
+      --cleanup
+      --rolling-restart
+
+volumes:
+  vysum-data:
