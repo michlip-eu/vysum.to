@@ -2,11 +2,11 @@ FROM node:alpine as build
 
 WORKDIR /app
 
-COPY package.json .
+COPY backend/package.json .
 
 RUN npm install
 
-COPY src/ .
+COPY backend/src/ .
 
 RUN npm run build
 
@@ -14,10 +14,10 @@ FROM node:alpine
 
 WORKDIR /app
 
-COPY package.json .
+COPY backend/package.json .
 
 RUN npm install --omit=dev
 
-COPY --from=build dist/ /app
+COPY --from=build /app/dist/ /app
 
 ENTRYPOINT [ "node ./index.js" ]

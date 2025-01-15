@@ -2,19 +2,19 @@ FROM node as build
 
 WORKDIR /app
 
-COPY package.json ./
+COPY frontend/package.json ./
 
 RUN npm install
 
-COPY src ./src
-COPY public ./public
-COPY index.html ./
-COPY tsconfig.json ./
-COPY tsconfig.app.json ./
-COPY vite.config.ts ./
-COPY tailwind.config.js ./
-COPY postcss.config.js ./
-COPY tsconfig.node.json ./
+COPY frontend/src ./src
+COPY frontend/public ./public
+COPY frontend/index.html ./
+COPY frontend/tsconfig.json ./
+COPY frontend/tsconfig.app.json ./
+COPY frontend/vite.config.ts ./
+COPY frontend/tailwind.config.js ./
+COPY frontend/postcss.config.js ./
+COPY frontend/tsconfig.node.json ./
 
 RUN npm run build
 
