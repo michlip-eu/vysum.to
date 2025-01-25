@@ -28,8 +28,9 @@ class db {
                 console.error('DB_HOST not set');
                 process.exit(1);
             }
-            console.debug('Resolving ' + host);
+            console.debug('Using ' + host);
             let ip: any = { address: host }
+            if (process.env.DB_RESOLVE == "true") console.debug('Resolving ' + host);
             if (process.env.DB_RESOLVE == "true") ip = await dns.promises.lookup(host).catch(err => {
                 console.error('Error looking up ' + host + ': ' + err);
                 process.exit(1);
