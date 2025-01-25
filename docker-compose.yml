@@ -13,6 +13,13 @@ services:
       replicas: 2
     restart: always
     image: ghcr.io/michlip-eu/vysum.to/backend:latest
+    environment:
+      - DB_HOST=localhost
+      - DB_RESOLVE=false
+      - DB_USER=vysum
+      - DB_DB=vysum
+      - DB_PASSWORD=example
+      - JWT_SECRET=JWT secret fo secure communication between server and client (frontend and backend)
     volumes:
       - storage:/app/image
   database:
