@@ -21,16 +21,11 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+          # Build and push Docker image
       - name: Build and Push Docker Image to GHCR
-        uses: docker/build-push-action@v4
-        with:
-          context: ./frontend
-          file: Dockerfile
-          push: true
-          tags: ghcr.io/${{ github.repository }}:frontend
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
+        run: |
+          docker build -t ghcr.io/${{ github.repository }}:frontend . --file frontend/Dockerfile
+          docker push ghcr.io/${{ github.repository }}:frontend
   backend:
     runs-on: ubuntu-latest
 
@@ -45,16 +40,11 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+          # Build and push Docker image
       - name: Build and Push Docker Image to GHCR
-        uses: docker/build-push-action@v4
-        with:
-          context: ./backend
-          file: Dockerfile
-          push: true
-          tags: ghcr.io/${{ github.repository }}:backend
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
+        run: |
+          docker build -t ghcr.io/${{ github.repository }}:backend . --file backend/Dockerfile
+          docker push ghcr.io/${{ github.repository }}:backend
   proxy:
     runs-on: ubuntu-latest
 
@@ -69,12 +59,8 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+          # Build and push Docker image
       - name: Build and Push Docker Image to GHCR
-        uses: docker/build-push-action@v4
-        with:
-          context: ./proxy
-          file: Dockerfile
-          push: true
-          tags: ghcr.io/${{ github.repository }}:proxy
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+        run: |
+          docker build -t ghcr.io/${{ github.repository }}:proxy .
+          docker push ghcr.io/${{ github.repository }}:proxy
