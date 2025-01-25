@@ -31,6 +31,11 @@ app.use(bodyParser.json({
 }));
 app.use(cookieParser());
 
+app.use((req: any, res: any, next: any) => {
+    console.log(req.method + ' ' + req.url);
+    next();
+});
+
 app.post('/api/user/register', async (req: any, res: any) => {
     const { email, password } = req.body;
     if (!email || !password) {
