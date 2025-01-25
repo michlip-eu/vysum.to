@@ -42,9 +42,6 @@ class db {
                 password: process.env.DB_PASSWORD,
                 database: process.env.DB_DB,
                 port: parseInt(process.env.DB_PORT || '3306'),
-                ssl: {
-                    rejectUnauthorized: false
-                },
                 waitForConnections: true,
                 connectionLimit: 100,
                 queueLimit: 100,
