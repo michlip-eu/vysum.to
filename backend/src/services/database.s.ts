@@ -46,7 +46,7 @@ class db {
                 },
                 waitForConnections: true,
                 connectionLimit: 100,
-                queueLimit: 100
+                queueLimit: 100,
             });
             console.debug('Creating simple query connection');
             try {
