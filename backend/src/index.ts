@@ -111,10 +111,7 @@ app.get('/api/user/data', AuthMiddleWare, async (req: any, res: any) => {
         return {
             ...cartItem,
             image: cartItem.image.startsWith('internal:') && existsSync(__dirname + cartItem.image.replace('internal:', '')) ? readFileSync(__dirname + cartItem.image.replace('internal:', '')).toString() : cartItem.image,
-            quantity: cart.filter((item) => item.id === cartItem.id).length
         }
-    }).filter((item, index, self) => {
-        return self.findIndex((t) => t.id === item.id) === index;
     });
     res.send({
         ...user,
@@ -131,9 +128,7 @@ app.post('/api/user/cart/add', AuthMiddleWare, async (req: any, res: any) => {
         return;
     }
     const conn = await db.getConnection();
-    for (let i = 0; i < quantity; i++) {
-        await conn.query('INSERT INTO cart (user_id, item_id) VALUES (?, ?)', [user.id, item_id]);
-    }
+    await conn.query('INSERT INTO cart (user_id, item_id, quantity) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE quantity = quantity + ?', [user.id, item_id, quantity || 1, quantity || 1]);
     conn.release();
     res.send('Položka přidána do košíku');
 });
@@ -146,7 +141,8 @@ app.post('/api/user/cart/remove', AuthMiddleWare, async (req: any, res: any) => 
         return;
     }
     const conn = await db.getConnection();
-    await conn.query('DELETE FROM cart WHERE user_id = ? AND item_id = ? LIMIT 1', [user.id, item_id]);
+    await conn.query('UPDATE cart SET quantity = quantity - 1 WHERE user_id = ? AND item_id = ? AND quantity > 0', [user.id, item_id]);
+    await conn.query('DELETE FROM cart WHERE quantity = 0', [user.id, item_id]);
     conn.release();
     res.send('Položka odstraněna z košíku');
 });
