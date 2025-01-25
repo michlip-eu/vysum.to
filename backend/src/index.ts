@@ -1,4 +1,4 @@
-import * as express from 'express';
+const express = require('express');
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
@@ -21,7 +21,7 @@ catchErrors.forEach((type) => {
 
 dotenv.config();
 new db();
-const app = express.default();
+const app = express();
 app.use(cors({
     origin: "*",
     credentials: true
