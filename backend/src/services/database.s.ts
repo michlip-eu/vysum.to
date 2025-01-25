@@ -44,7 +44,7 @@ class db {
                 port: parseInt(process.env.DB_PORT || '3306'),
                 waitForConnections: true,
                 connectionLimit: 10,
-                queueLimit: 10,
+                queueLimit: 0,
             });
             console.debug('Creating simple query connection');
             try {
