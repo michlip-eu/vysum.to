@@ -1,4 +1,4 @@
-import { JwtToken, UsersModel } from "@/models/users.m"
+import { JwtToken, UsersModel } from "../models/users.m"
 import db from "./database.s"
 import jwt from "jsonwebtoken"
 
