@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import './App.css';
 import Sumivka1 from './assets/sumivka1.png';
 import Sumivka2 from './assets/sumivka2.png';
@@ -12,47 +12,6 @@ import MartinDvorak from './assets/onas.png';
 function App() {
     const sectionsRef = useRef<(HTMLElement | null)[]>([]);
     const [menuOpen, setMenuOpen] = useState(false);
-
-    useEffect(() => {
-        const handleScroll = (event: WheelEvent | TouchEvent) => {
-            const isDesktop = window.innerWidth > 768;
-            if (!isDesktop) return;
-            event.preventDefault();
-            let delta = 0;
-
-            if ('deltaY' in event) {
-                delta = event.deltaY;
-            } else if ('touches' in event) {
-                // Handle touch events if needed
-                // Example: Implement touch-based scrolling logic
-                return;
-            }
-
-            const currentIndex = sectionsRef.current.findIndex(section => {
-                const rect = section?.getBoundingClientRect();
-                return rect && rect.top <= window.innerHeight / 2 && rect.bottom >= window.innerHeight / 2;
-            });
-
-            let targetIndex = currentIndex;
-            if (delta > 0) {
-                targetIndex = Math.min(currentIndex + 1, sectionsRef.current.length - 1);
-            } else {
-                targetIndex = Math.max(currentIndex - 1, 0);
-            }
-
-            sectionsRef.current[targetIndex]?.scrollIntoView({ behavior: 'smooth' });
-        };
-
-
-        window.addEventListener('wheel', handleScroll, { passive: false });
-        window.addEventListener('touchstart', handleScroll, { passive: false });
-
-        return () => {
-
-            window.removeEventListener('wheel', handleScroll);
-            window.removeEventListener('touchstart', handleScroll);
-        };
-    }, []);
 
     const toggleMenu = () => {
         setMenuOpen(!menuOpen);
@@ -85,28 +44,28 @@ function App() {
                 </div>
             </div>
             <div className="container" id="produkty" data-primary="#03dac6" data-secondary="#ff7e5f" ref={el => sectionsRef.current[1] = el}>
-                <h2 style={{ color: "white" }}>Naše Produkty</h2>
+                <h2 style={{ color: "white", marginBottom: "2rem" }}>Naše Produkty</h2>
                 <div className="produkty-list">
                     <div className="produkt">
                         <img src={Sumivka1} alt="Produkt 1" className="produkt-image" />
-                        <h3>Produkt 1</h3>
-                        <p>Popis produktu 1.</p>
-                        <p className="price">Cena: 299 Kč</p>
-                        <button className="btn-buy">Koupit</button>
+                        <h3>Vitamín C + Zinek</h3>
+                        <p>Posilte svou imunitu s našimi šumivými tabletami obsahujícími vysokou dávku vitamínu C a zinku.</p>
+                        <p className="price">299 Kč</p>
+                        <button className="btn-buy">Do košíku</button>
                     </div>
                     <div className="produkt">
                         <img src={Sumivka2} alt="Produkt 2" className="produkt-image" />
-                        <h3>Produkt 2</h3>
-                        <p>Popis produktu 2.</p>
-                        <p className="price">Cena: 399 Kč</p>
-                        <button className="btn-buy">Koupit</button>
+                        <h3>Hořčík + B6</h3>
+                        <p>Ideální kombinace pro podporu svalové funkce a snížení únavy.</p>
+                        <p className="price">399 Kč</p>
+                        <button className="btn-buy">Do košíku</button>
                     </div>
                     <div className="produkt">
                         <img src={Sumivka3} alt="Produkt 3" className="produkt-image" />
-                        <h3>Produkt 3</h3>
-                        <p>Popis produktu 3.</p>
-                        <p className="price">Cena: 499 Kč</p>
-                        <button className="btn-buy">Koupit</button>
+                        <h3>Multivitamín</h3>
+                        <p>Komplexní směs vitamínů a minerálů pro každodenní podporu zdraví.</p>
+                        <p className="price">499 Kč</p>
+                        <button className="btn-buy">Do košíku</button>
                     </div>
                 </div>
             </div>

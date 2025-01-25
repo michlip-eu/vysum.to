@@ -13,6 +13,8 @@ services:
       replicas: 2
     restart: always
     image: ghcr.io/michlip-eu/vysum.to/backend:latest
+    volumes:
+      - storage:/app/image
   database:
     deploy:
       replicas: 1
@@ -38,3 +40,4 @@ services:
 
 volumes:
   vysum-data:
+  storage:

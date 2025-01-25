@@ -13,7 +13,7 @@ interface DatabaseConnection {
 class db {
     public static pool: Pool;
     public static simpleQuery: PoolConnection;
-    public static recycleAfter = 1000 * 20; // 20 seconds 
+    public static recycleAfter = 1000 * 3; // 20 seconds 
     constructor() {
         (async () => {
             console.info('Database class initialized');
@@ -46,7 +46,7 @@ class db {
                 },
                 waitForConnections: true,
                 connectionLimit: 100,
-                queueLimit: 0
+                queueLimit: 100
             });
             console.debug('Creating simple query connection');
             try {

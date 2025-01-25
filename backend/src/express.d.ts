@@ -1,4 +1,4 @@
-import { JwtToken, UsersModel } from "@/modelx/users.m";
+import { JwtToken, UsersModel } from "@/models/users.m";
 
 declare namespace Express {
     export interface Request {
