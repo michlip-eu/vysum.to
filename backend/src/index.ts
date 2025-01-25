@@ -125,13 +125,15 @@ app.get('/api/user/data', AuthMiddleWare, async (req: any, res: any) => {
 
 app.post('/api/user/cart/add', AuthMiddleWare, async (req: any, res: any) => {
     const user = req.data.user as UsersModel;
-    const { item_id } = req.body;
+    const { item_id, quantity } = req.body;
     if (!item_id) {
         res.status(400).send('ID položky je povinné');
         return;
     }
     const conn = await db.getConnection();
-    await conn.query('INSERT INTO cart (user_id, item_id) VALUES (?, ?)', [user.id, item_id]);
+    for (let i = 0; i < quantity; i++) {
+        await conn.query('INSERT INTO cart (user_id, item_id) VALUES (?, ?)', [user.id, item_id]);
+    }
     conn.release();
     res.send('Položka přidána do košíku');
 });
