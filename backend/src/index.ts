@@ -99,7 +99,7 @@ app.get('/api/user/logout', async (req: any, res: any) => {
 app.get('/api/user/data', AuthMiddleWare, async (req: any, res: any) => {
     const user = req.data.user as UsersModel;
     const cart: any[] = await db.getConnection().then((conn) => {
-        const u = conn.query('SELECT i.id, i.name, i.image, i.description, i.price FROM cart c JOIN products i ON c.item_id = i.id WHERE c.user_id = ?', [user.id]);
+        const u = conn.query('SELECT i.id, c.quantity, i.name, i.image, i.description, i.price FROM cart c JOIN products i ON c.item_id = i.id WHERE c.user_id = ?', [user.id]);
         conn.release();
         return u;
     }).then((result) => {
@@ -112,7 +112,7 @@ app.get('/api/user/data', AuthMiddleWare, async (req: any, res: any) => {
             ...cartItem,
             image: cartItem.image.startsWith('internal:') && existsSync(__dirname + cartItem.image.replace('internal:', '')) ? readFileSync(__dirname + cartItem.image.replace('internal:', '')).toString() : cartItem.image,
         }
-    });
+    })
     res.send({
         ...user,
         password: undefined,
