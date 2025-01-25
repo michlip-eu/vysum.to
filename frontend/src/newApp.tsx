@@ -191,9 +191,48 @@ export const App = () => {
 
     </>
 }
+
+interface Cache {
+    id: number,
+    quantity: number
+}
+
 export const Products = () => {
     const [storage, setStorage] = useState(store.getState())
     const [search, setSearch] = useState("")
+    const [cached, setCached] = useState<Cache[]>([])
+    useEffect(() => {
+        setInterval(() => {
+            setCached((cs) => {
+                if (cs.length > 0) {
+                    for (let i = 0; i < cs.length; i++) {
+                        fetch("/api/user/cart/add", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({ item_id: cs[i].id, quantity: cs[i].quantity }),
+                            credentials: "include"
+                        }).then(res => {
+                            if (res.ok) return;
+                            throw new Error("Failed to add to cart")
+                        }).catch((err) => {
+                            console.error(err)
+                        })
+                    }
+                }
+                fetch("/api/user/data", {
+                    credentials: "include"
+                }).then(res => {
+                    if (res.ok) return res.json()
+                    throw new Error("Failed to fetch user")
+                }).then((user: User) => {
+                    store.getActions().setUser(user)
+                }).catch(console.error)
+                return []
+            })
+        }, 1000)
+    }, [])
     store.subscribe(() => {
         setStorage(store.getState())
     })
@@ -202,27 +241,14 @@ export const Products = () => {
             toast.error("Přihlašte se nebo zaregistrujte")
             return;
         }
-        fetch("/api/user/cart/add", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ item_id: product.id }),
-            credentials: "include"
-        }).then(res => {
-            if (res.ok) return toast.success("Přidáno do košíku", { autoClose: 750 })
-            toast.error("Přidání se nezdařilo")
-            throw new Error("Failed to add to cart")
+        setCached((cs) => {
+            const index = cs.findIndex(c => c.id === product.id)
+            if (index !== -1) {
+                cs[index].quantity += 1
+                return cs
+            }
+            return [...cs, { id: product.id, quantity: 1 }]
         })
-            .catch(console.error)
-        fetch("/api/user/data", {
-            credentials: "include"
-        }).then(res => {
-            if (res.ok) return res.json()
-            throw new Error("Failed to fetch user")
-        }).then((user: User) => {
-            store.getActions().setUser(user)
-        }).catch(console.error)
     }
     return <>
         <div className="container">
