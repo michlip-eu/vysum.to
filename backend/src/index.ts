@@ -11,13 +11,13 @@ import jwt from 'jsonwebtoken';
 import Crypto from 'crypto';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 
-const catchErrors = ["unhandledRejection", "uncaughtException", "SIGINT", "SIGTERM", "SIGQUIT", "EOENT"];
-catchErrors.forEach((type) => {
-    process.on(type, (err) => {
-        console.error(`Error: ${err.message}`);
-        process.exit(1);
-    });
-});
+// const catchErrors = ["unhandledRejection", "uncaughtException", "SIGINT", "SIGTERM", "SIGQUIT", "EOENT"];
+// catchErrors.forEach((type) => {
+//     process.on(type, (err) => {
+//         console.error(`Error: ${err.message}`);
+//         process.exit(1);
+//     });
+// });
 
 dotenv.config();
 new db();
