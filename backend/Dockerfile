@@ -21,4 +21,4 @@ RUN npm install --omit=dev
 
 COPY --from=build /app/dist/ /app
 
-ENTRYPOINT [ "node ./index.js" ]
+CMD [ "node", "./index.js" ]
