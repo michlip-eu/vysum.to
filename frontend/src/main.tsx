@@ -6,7 +6,7 @@ import { StoreProvider } from 'easy-peasy'
 import { store } from './store'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import { AdminOverlay, AdminMainPage, AdminProducts, AdminProductAdd, AdminProductEdit, AdminUsers, AdminContact, AdminOrders } from './admin'
+import { AdminOverlay, AdminMainPage, AdminProducts, AdminProductAdd, AdminProductEdit, AdminUsers, AdminContact, AdminOrders, AdminOrderDetail } from './admin'
 import './index.css'
 
 
@@ -22,6 +22,10 @@ const routes = createBrowserRouter([
       {
         path: "orders",
         Component: AdminOrders
+      },
+      {
+        path: "order/*",
+        Component: AdminOrderDetail
       },
       {
         path: "users",

@@ -234,12 +234,12 @@ app.get('/api/admin/orders', AuthMiddleWare, async (req: any, res: any) => {
     }
     const conn = await db.getConnection();
     const orders = await conn.query('SELECT * FROM orders').then((result) => {
-        return result[0] as { city: string, street: string, zip: string, phone: string, name: string, surname: string, order_id: string, items: ItemsModel[] }[];
+        return result[0] as { id: number, city: string, street: string, zip: string, phone: string, name: string, surname: string, order_id: string, items: ItemsModel[] }[];
     }).catch(() => {
         return [];
     });
     for (let i = 0; i < orders.length; i++) {
-        orders[i].items = await conn.query('SELECT i.id, oi.quantity, i.name, i.image, i.description, i.price FROM order_items oi JOIN products i ON oi.item_id = i.id WHERE oi.order_id = ?', [orders[i].order_id]).then((result) => {
+        orders[i].items = await conn.query('SELECT i.id, oi.quantity, i.name, i.image, i.description, i.price FROM order_items oi JOIN products i ON oi.item_id = i.id WHERE oi.order_id = ?', [orders[i].id]).then((result) => {
             return result[0];
         }).catch(() => {
             return [];

@@ -743,14 +743,7 @@ export const AdminOrders = () => {
                     <p>{order.city}</p>
                     <p>{order.zip}</p>
                     <p>{order.status}</p>
-                    <div className="items">
-                        {order.items.map((item: any) => (
-                            <div className="item" key={item.id}>
-                                <h3>{item.name}</h3>
-                                <p>{item.quantity}x {item.price.toFixed(2)} Kč</p>
-                            </div>
-                        ))}
-                    </div>
+                    <Link to={`/admin/order/${order.id}`} className="btn-buy">Detail</Link>
                     {order.status !== "Doručeno" && <button className="btn-buy" onClick={() => change(order.id, stages.indexOf(order.status))}>{buttons[stages.indexOf(order.status)]}</button>}
                 </div>
             ))}
@@ -815,5 +808,74 @@ export const AdminOrders = () => {
         }
         `}
         </style>
+    </div>
+}
+
+export const AdminOrderDetail = () => {
+    const [order, setOrder] = useState({})
+    const [storage, setStorage] = useState(store.getState())
+    store.subscribe(() => {
+        setStorage(store.getState())
+    })
+    const stages = [
+        "Vyřizuje se",
+        "Potvrzeno",
+        "Odesláno",
+        "Doručeno"
+    ]
+    const buttons = [
+        "Potvrdit",
+        "Odeslat",
+        "Doručit"
+    ]
+    const urls = [
+        "/api/admin/orders/confirm/",
+        "/api/admin/orders/ship/",
+        "/api/admin/orders/deliver/"
+    ]
+    useEffect(() => {
+        const id = parseInt(window.location.pathname.split("/").pop() as string)
+        fetch(`/api/admin/orders`).then(res => {
+            if (res.ok) return res.json()
+            throw new Error("Failed to fetch order")
+        }).then(order => {
+            setOrder(order.find((o: any) => o.id === id))
+            console.log(order)
+        }).catch(console.error)
+    }, [])
+    const change = (id: number, stage: number) => {
+        fetch(urls[stage] + id, {
+            method: "PATCH",
+            credentials: "include"
+        }).then(res => {
+            if (res.ok) return toast.success("Objednávka byla změněna")
+            throw new Error("Failed to change order")
+        }).then(() => {
+            fetch(`/api/admin/order/${id}`).then(res => {
+                if (res.ok) return res.json()
+                throw new Error("Failed to fetch order")
+            }).then(order => {
+                setOrder(order)
+                console.log(order)
+            }).catch(console.error)
+        }).catch(console.error)
+    }
+    return <div className="container">
+        <div className="top-group">
+            <h1>Detail objednávky</h1>
+        </div>
+        <div className="products-list">
+            {order.items && order.items.map((item: any) => (
+                <div className="product" key={item.id}>
+                    <img src={item.image} alt={item.name} className="product-image" />
+                    <div className="product-content">
+                        <h3>{item.name}</h3>
+                        <p>{item.description}</p>
+                        <p className="price">{item.price.toFixed(2)} Kč</p>
+                        <p>Množství: {item.quantity}</p>
+                    </div>
+                </div>
+            ))}
+        </div>
     </div>
 }
