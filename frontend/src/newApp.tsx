@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { Link, useNavigate, useParams } from "react-router-dom"
-import { store, Product, User } from "./store"
+import { store, Product, User, Order } from "./store"
 import { toast } from "react-toastify"
 
 
