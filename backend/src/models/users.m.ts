@@ -8,6 +8,7 @@ export interface CartModel {
     id: number
     user_id: number
     item_id: number
+    quantity: number
 }
 export interface ItemsModel {
     id: number

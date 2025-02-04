@@ -1,10 +1,24 @@
 import { action, Action, createStore } from 'easy-peasy'
 
+export interface Order {
+    city: string
+    id: number
+    items: Product[]
+    name: string
+    phone: string
+    status: string
+    street: string
+    surname: string
+    user_id: number
+    zip: string
+}
+
 export interface User {
     id: number
     name: string
     email: string
     role: string
+    orders: Order[]
     items: {
         id: number
         name: string

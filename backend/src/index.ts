@@ -116,7 +116,8 @@ app.get('/api/user/data', AuthMiddleWare, async (req: any, res: any) => {
     res.send({
         ...user,
         password: undefined,
-        items
+        items,
+        orders: []
     });
 });
 
@@ -147,6 +148,20 @@ app.post('/api/user/cart/remove', AuthMiddleWare, async (req: any, res: any) => 
     res.send('Položka odstraněna z košíku');
 });
 
+app.post('/api/user/cart/removeAll', AuthMiddleWare, async (req: any, res: any) => {
+    const user = req.data.user as UsersModel;
+    const { item_id } = req.body;
+    if (!item_id) {
+        res.status(400).send('ID položky je povinné');
+        return;
+    }
+    const conn = await db.getConnection();
+    await conn.query('UPDATE cart SET quantity = 0 WHERE user_id = ? AND item_id = ?', [user.id, item_id]);
+    await conn.query('DELETE FROM cart WHERE quantity = 0', [user.id, item_id]);
+    conn.release();
+    res.send('Položka odstraněna z košíku');
+});
+
 app.get('/api/user/cart/clear', AuthMiddleWare, async (req: any, res: any) => {
     const user = req.data.user as UsersModel;
     const conn = await db.getConnection();
@@ -154,6 +169,174 @@ app.get('/api/user/cart/clear', AuthMiddleWare, async (req: any, res: any) => {
     conn.release();
     res.send('Košík vyčištěn');
 });
+
+app.post('/api/user/cart/checkout', AuthMiddleWare, async (req: any, res: any) => {
+    const user = req.data.user as UsersModel;
+    const { city, street, zip, phone, name, surname } = req.body;
+    if (!city || !street || !zip || !phone || !name || !surname) {
+        res.status(400).send('Město, ulice, PSČ, telefon, jméno a příjmení jsou povinné');
+        return;
+    }
+    const conn = await db.getConnection();
+    const cart: CartModel[] = await conn.query('SELECT * FROM cart WHERE user_id = ?', [user.id]).then((result) => {
+        return result[0] as CartModel[];
+    }).catch(() => {
+        return [];
+    });
+    if (cart.length === 0) {
+        res.status(400).send('Košík je prázdný');
+        return;
+    }
+    await conn.query('INSERT INTO orders (user_id, city, street, zip, phone, name, surname) VALUES (?, ?, ?, ?, ?, ?, ?)', [user.id, city, street, zip, phone, name, surname]);
+    const order = await conn.query('SELECT LAST_INSERT_ID() as id').then((result: any) => {
+        return result[0][0].id as number;
+    }).catch(() => {
+        return 0;
+    });
+    await conn.query('DELETE FROM cart WHERE user_id = ?', [user.id]);
+    for (let i = 0; i < cart.length; i++) {
+        await conn.query('INSERT INTO order_items (order_id, item_id, quantity) VALUES (?, ?, ?)', [order, cart[i].item_id, cart[i].quantity]);
+    }
+    conn.release();
+    res.send('Objednávka odeslána');
+});
+
+app.get('/api/user/orders', AuthMiddleWare, async (req: any, res: any) => {
+    const user = req.data.user as UsersModel;
+    const conn = await db.getConnection();
+    const orders = await conn.query('SELECT * FROM orders WHERE user_id = ?', [user.id]).then((result) => {
+        return result[0] as { id: number, city: string, street: string, zip: string, phone: string, name: string, surname: string, order_id: string, items: ItemsModel[] }[];
+    }).catch(() => {
+        return [];
+    });
+    for (let i = 0; i < orders.length; i++) {
+        orders[i].items = await conn.query('SELECT i.id, oi.quantity, i.name, i.image, i.description, i.price FROM order_items oi JOIN products i ON oi.item_id = i.id WHERE oi.order_id = ?', [orders[i].id]).then((result) => {
+            return result[0];
+        }).catch(() => {
+            return [];
+        }) as any[];
+        orders[i].items = orders[i].items.map((item) => {
+            return {
+                ...item,
+                image: item.image.startsWith('internal:') && existsSync(__dirname + item.image.replace('internal:', '')) ? readFileSync(__dirname + item.image.replace('internal:', '')).toString() : item.image,
+            }
+        });
+    }
+    conn.release();
+    res.send(orders);
+});
+
+app.get('/api/admin/orders', AuthMiddleWare, async (req: any, res: any) => {
+    const user = req.data.user as UsersModel;
+    if (user.role !== 'admin') {
+        res.status(403).send('Zakázáno');
+        return;
+    }
+    const conn = await db.getConnection();
+    const orders = await conn.query('SELECT * FROM orders').then((result) => {
+        return result[0] as { city: string, street: string, zip: string, phone: string, name: string, surname: string, order_id: string, items: ItemsModel[] }[];
+    }).catch(() => {
+        return [];
+    });
+    for (let i = 0; i < orders.length; i++) {
+        orders[i].items = await conn.query('SELECT i.id, oi.quantity, i.name, i.image, i.description, i.price FROM order_items oi JOIN products i ON oi.item_id = i.id WHERE oi.order_id = ?', [orders[i].order_id]).then((result) => {
+            return result[0];
+        }).catch(() => {
+            return [];
+        }) as any[];
+        orders[i].items = orders[i].items.map((item) => {
+            return {
+                ...item,
+                image: item.image.startsWith('internal:') && existsSync(__dirname + item.image.replace('internal:', '')) ? readFileSync(__dirname + item.image.replace('internal:', '')).toString() : item.image,
+            }
+        });
+    }
+    conn.release();
+    res.send(orders);
+});
+
+app.get('/api/admin/orders/clear', AuthMiddleWare, async (req: any, res: any) => {
+    const user = req.data.user as UsersModel;
+    if (user.role !== 'admin') {
+        res.status(403).send('Zakázáno');
+        return;
+    }
+    const conn = await db.getConnection();
+    await conn.query('DELETE FROM orders');
+    await conn.query('DELETE FROM order_items');
+    conn.release();
+    res.send('Objednávky smazány');
+});
+
+app.get('/api/admin/orders/clear/:id', AuthMiddleWare, async (req: any, res: any) => {
+    const user = req.data.user as UsersModel;
+    if (user.role !== 'admin') {
+        res.status(403).send('Zakázáno');
+        return;
+    }
+    const { id } = req.params;
+    if (!id) {
+        res.status(400).send('ID je povinné');
+        return;
+    }
+    const conn = await db.getConnection();
+    await conn.query('DELETE FROM orders WHERE order_id = ?', [id]);
+    await conn.query('DELETE FROM order_items WHERE order_id = ?', [id]);
+    conn.release();
+    res.send('Objednávka smazána');
+});
+
+app.patch('/api/admin/orders/confirm/:id', AuthMiddleWare, async (req: any, res: any) => {
+    const user = req.data.user as UsersModel;
+    if (user.role !== 'admin') {
+        res.status(403).send('Zakázáno');
+        return;
+    }
+    const { id } = req.params;
+    if (!id) {
+        res.status(400).send('ID je povinné');
+        return;
+    }
+    const conn = await db.getConnection();
+    await conn.query('UPDATE orders SET status = "Potvrzeno" WHERE id = ?', [id]);
+    conn.release();
+    res.send('Objednávka potvrzena');
+});
+
+app.patch('/api/admin/orders/ship/:id', AuthMiddleWare, async (req: any, res: any) => {
+    const user = req.data.user as UsersModel;
+    if (user.role !== 'admin') {
+        res.status(403).send('Zakázáno');
+        return;
+    }
+    const { id } = req.params;
+    if (!id) {
+        res.status(400).send('ID je povinné');
+        return;
+    }
+    const conn = await db.getConnection();
+    await conn.query('UPDATE orders SET status = "Odesláno" WHERE id = ?', [id]);
+    conn.release();
+    res.send('Objednávka odeslána');
+});
+
+app.patch('/api/admin/orders/deliver/:id', AuthMiddleWare, async (req: any, res: any) => {
+    const user = req.data.user as UsersModel;
+    if (user.role !== 'admin') {
+        res.status(403).send('Zakázáno');
+        return;
+    }
+    const { id } = req.params;
+    if (!id) {
+        res.status(400).send('ID je povinné');
+        return;
+    }
+    const conn = await db.getConnection();
+    await conn.query('UPDATE orders SET status = "Doručeno" WHERE id = ?', [id]);
+    conn.release();
+    res.send('Objednávka doručena');
+});
+
 
 app.get('/api/products', async (req: any, res: any) => {
     const conn = await db.getConnection();

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useNavigate, useParams } from "react-router-dom"
 import { store, Product, User } from "./store"
 import { toast } from "react-toastify"
 
@@ -53,6 +53,7 @@ export const Navbar = () => {
                 }
                 {storage.user ? <li><Link to="/cart"><i className="fas fa-shopping-cart"></i> Košík</Link></li> :
                     <li><Link to="/login"><i className="fas fa-user-shield"></i>Přihlásit se</Link></li>}
+                {storage.user && <li><Link to="/orders"><i className="fas fa-list"></i> Moje objednávky</Link></li>}
                 {storage.user && <li><Link to="/logout"><i className="fas fa-sign-out-alt"></i> Odhlásit se</Link></li>}
             </div>
         </nav>
@@ -200,39 +201,6 @@ interface Cache {
 export const Products = () => {
     const [storage, setStorage] = useState(store.getState())
     const [search, setSearch] = useState("")
-    const [cached, setCached] = useState<Cache[]>([])
-    useEffect(() => {
-        setInterval(() => {
-            setCached((cs) => {
-                if (cs.length > 0) {
-                    for (let i = 0; i < cs.length; i++) {
-                        fetch("/api/user/cart/add", {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json"
-                            },
-                            body: JSON.stringify({ item_id: cs[i].id, quantity: cs[i].quantity }),
-                            credentials: "include"
-                        }).then(res => {
-                            if (res.ok) return;
-                            throw new Error("Failed to add to cart")
-                        }).catch((err) => {
-                            console.error(err)
-                        })
-                    }
-                }
-                fetch("/api/user/data", {
-                    credentials: "include"
-                }).then(res => {
-                    if (res.ok) return res.json()
-                    throw new Error("Failed to fetch user")
-                }).then((user: User) => {
-                    store.getActions().setUser(user)
-                }).catch(console.error)
-                return []
-            })
-        }, 1000)
-    }, [])
     store.subscribe(() => {
         setStorage(store.getState())
     })
@@ -241,14 +209,26 @@ export const Products = () => {
             toast.error("Přihlašte se nebo zaregistrujte")
             return;
         }
-        setCached((cs) => {
-            const index = cs.findIndex(c => c.id === product.id)
-            if (index !== -1) {
-                cs[index].quantity += 1
-                return cs
-            }
-            return [...cs, { id: product.id, quantity: 1 }]
+        fetch("/api/user/cart/add", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ item_id: product.id }),
+            credentials: "include"
+        }).then(res => {
+            if (res.ok) return;
+            throw new Error("Failed to add to cart")
         })
+            .catch(console.error)
+        fetch("/api/user/data", {
+            credentials: "include"
+        }).then(res => {
+            if (res.ok) return res.json()
+            throw new Error("Failed to fetch user")
+        }).then((user: User) => {
+            store.getActions().setUser(user)
+        }).catch(console.error)
     }
     return <>
         <div className="container">
@@ -559,6 +539,7 @@ export const Cart = () => {
             store.getActions().setUser(user)
         }).catch(console.error)
     }
+    if (!storage.user) return <App />
     return <>
         <div className="container">
             <h1>Košík</h1>
@@ -578,8 +559,9 @@ export const Cart = () => {
                     </div>
                 ))}
             </div>
-            <p style={{ textAlign: "right", fontSize: "1.5rem", fontWeight: "bold" }}>Celkem: {storage.user?.items.reduce((acc, item) => acc + item.price * item.quantity, 0).toFixed(2)} Kč</p>
+            <p style={{ textAlign: "right", fontSize: "1.5rem", fontWeight: "bold", color: "white" }}>Celkem: {storage.user?.items.reduce((acc, item) => acc + item.price * item.quantity, 0).toFixed(2)} Kč</p>
             <button className="btn-buy" onClick={clearCart}><i className="fas fa-trash"></i> Vyprázdnit košík</button>
+            <Link to="/buy" className="btn-buy"><i className="fas fa-shopping-cart"></i> Pokračovat k platbě</Link>
         </div>
         <style>{`
             .container {
@@ -648,6 +630,343 @@ export const Cart = () => {
         `}</style>
     </>
 }
+
+export const Buy = () => {
+    const navigate = useNavigate()
+    const [storage, setStorage] = useState(store.getState())
+    const [name, setName] = useState("")
+    const [surname, setSurname] = useState("")
+    const [phone, setPhone] = useState("")
+    const [street, setStreet] = useState("")
+    const [city, setCity] = useState("")
+    const [zip, setZip] = useState("")
+    const [error, setError] = useState("")
+    const [loading, setLoading] = useState(false)
+    store.subscribe(() => {
+        setStorage(store.getState())
+    })
+    const buy = () => {
+        setLoading(true)
+        fetch("/api/user/cart/checkout", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ name, surname, phone, street, city, zip }),
+            credentials: "include"
+        }).then(res => {
+            if (res.ok) {
+                toast.success("Objednávka proběhla úspěšně")
+                navigate("/orders")
+                return;
+            }
+            toast.error("Objednávka se nezdařila")
+            throw new Error("Failed to buy")
+        }).catch((err) => setError(err.message))
+            .finally(() => setLoading(false))
+    }
+    if (!storage.user) return <App />
+    return <>
+        <div className="container">
+            <form onSubmit={e => { e.preventDefault(); buy() }}>
+                <h1>Objednávka</h1>
+                <div className="form-group">
+                    <label htmlFor="name">Jméno:</label>
+                    <input type="text" id="name" value={name} onChange={e => setName(e.target.value)} />
+                </div>
+                <div className="form-group">
+                    <label htmlFor="surname">Příjmení:</label>
+                    <input type="text" id="surname" value={surname} onChange={e => setSurname(e.target.value)} />
+                </div>
+                <div className="form-group">
+                    <label htmlFor="phone">Telefon:</label>
+                    <input type="text" id="phone" value={phone} onChange={e => setPhone(e.target.value)} />
+                </div>
+                <div className="form-group">
+                    <label htmlFor="street">Ulice:</label>
+                    <input type="text" id="street" value={street} onChange={e => setStreet(e.target.value)} />
+                </div>
+                <div className="form-group">
+                    <label htmlFor="city">Město:</label>
+                    <input type="text" id="city" value={city} onChange={e => setCity(e.target.value)} />
+                </div>
+                <div className="form-group">
+                    <label htmlFor="zip">PSČ:</label>
+                    <input type="text" id="zip" value={zip} onChange={e => setZip(e.target.value)} />
+                </div>
+                <button type="submit" disabled={loading}>{loading ? "Probíhá objednávka..." : "Objednat"}</button>
+                {error && <p style={{ color: "red" }}>{error}</p>}
+            </form>
+        </div>
+        <style>{`
+            .container {
+                padding: 2rem;
+                width: 100%;
+                height: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center
+
+            }
+            form {
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+                width: 100%;
+                max-width: 300px;
+                background-color: white;
+                padding: 2rem;
+                border-radius: 5px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            }
+            form h1 {
+                text-align: center;
+            }
+            .form-group {
+                display: flex;
+                flex-direction: column;
+            }
+            label {
+                font-weight: bold;
+            }
+            input, button, textarea {
+                padding: 0.5rem;
+                border-radius: 5px;
+                border: 1px solid #6200ea;
+            }
+            button {
+                background-color: #6200ea;
+                color: white;
+                border: none;
+                cursor: pointer;
+            }
+            button:disabled {
+                color: #666;
+                cursor: not-allowed;
+            }
+                p {
+                    text-align: center;
+                }
+        `}</style>
+    </>
+};
+
+export const Orders = () => {
+    const navigate = useNavigate()
+    const [storage, setStorage] = useState(store.getState())
+    store.subscribe(() => {
+        setStorage(store.getState())
+    })
+    useEffect(() => {
+        fetch("/api/user/orders", {
+            credentials: "include"
+        }).then(res => {
+            if (res.ok) return res.json()
+            throw new Error("Failed to fetch orders")
+        }).then((orders: Order[]) => {
+            store.getActions().setUser({ ...storage.user, orders })
+        }).catch(console.error)
+    }, [])
+    if (!storage.user) return <App />
+    return <>
+        <div className="container">
+            <h1>Objednávky</h1>
+            <div className="products-list">
+                {storage.user?.orders.map(order => (
+                    <div className="product" key={order.id}>
+                        <div className="product-content">
+                            <h3>Objednávka č. {order.id}</h3>
+                            <p>Jméno: {order.name}</p>
+                            <p>Příjmení: {order.surname}</p>
+                            <p>Telefon: {order.phone}</p>
+                            <p>Ulice: {order.street}</p>
+                            <p>Město: {order.city}</p>
+                            <p>PSČ: {order.zip}</p>
+                            <p>Celkem: {order.items.reduce((acc, item) => acc + item.price * item.quantity, 0).toFixed(2)} Kč</p>
+                            <p>Stav: {order.status}</p>
+                            <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                <button className="btn-buy" onClick={() => { navigate(`/order/${order.id}`) }}>Detail</button>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+        <style>{`
+            .container {
+                padding: 2rem;
+            }
+            .products-list {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap: 2rem;
+            }
+            .product {
+                background-color: #6200ea;
+                padding: 1rem;
+                border-radius: 5px;
+                color: white;
+                height: 100vh;
+                max-height: 600px;
+                width: 100%;
+                max-width: 300px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                background-color: snow;
+                color: rgb(0, 0, 0);
+                text-align: center;
+            }
+            .product .btn-buy {
+                background-color: #6200ea;
+                color: white;
+            }
+            .product-image {
+                width: 100%;
+                border-radius: 5px;
+            }
+            .price {
+                font-size: 1.5rem;
+                font-weight: bold;
+            }
+            @media (max-width: 768px) {
+                .container {
+                    padding: 1rem;
+                }
+                .products-list {
+                    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                }
+                .product {
+                    height: auto;
+                    width: 280px;
+                }
+            }
+
+            .btn-buy {
+                background-color: white;
+                color: #6200ea;
+                padding: 0.5rem 1rem;
+                margin-left: 0.5rem;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: 0.3s;
+            }
+            .btn-buy:hover {
+                transform: scale(1.1);
+            }
+
+        `}</style>
+    </>
+}
+
+export const OrderDetail = () => {
+    const [storage, setStorage] = useState(store.getState())
+    store.subscribe(() => {
+        setStorage(store.getState())
+    })
+    useEffect(() => {
+        fetch("/api/user/orders", {
+            credentials: "include"
+        }).then(res => {
+            if (res.ok) return res.json()
+            throw new Error("Failed to fetch orders")
+        }).then((orders: Order[]) => {
+            store.getActions().setUser({ ...storage.user, orders })
+        }).catch(console.error)
+    }, [])
+    const id = window.location.pathname.split("/").pop()
+    if (!storage.user) return <App />
+    const order = storage.user?.orders.find(order => order.id === parseInt(id))
+    if (!order) return <App />
+    return <>
+        <div className="container">
+            <h1>Objednávka č. {order.id}</h1>
+            <div className="products-list">
+                {order.items.map(product => (
+                    <div className="product" key={product.id}>
+                        <img src={product.image} alt={product.name} className="product-image" />
+                        <div className="product-content">
+                            <h3>{product.name}</h3>
+                            <p>{product.description}</p>
+                            <p className="price">{product.price.toFixed(2)} Kč</p>
+                            <p>Množství: {product.quantity}</p>
+                            <p>Celkem: {(product.price * product.quantity).toFixed(2)} Kč</p>
+                        </div>
+                    </div>
+                ))}
+            </div>
+            <p style={{ textAlign: "right", fontSize: "1.5rem", fontWeight: "bold", color: "white" }}>Stav: {order.status}</p>
+            <p style={{ textAlign: "right", fontSize: "1.5rem", fontWeight: "bold", color: "white" }}>Celkem: {order.items.reduce((acc, item) => acc + item.price * item.quantity, 0).toFixed(2)} Kč</p>
+        </div>
+        <style>{`
+            .container {
+                padding: 2rem;
+            }
+            .products-list {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap: 2rem;
+            }
+            .product {
+                background-color: #6200ea;
+                padding: 1rem;
+                border-radius: 5px;
+                color: white;
+                height: 100vh;
+                max-height: 600px;
+                width: 100%;
+                max-width: 300px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                background-color: snow;
+                color: rgb(0, 0, 0);
+                text-align: center;
+            }
+            .product .btn-buy {
+                background-color: #6200ea;
+                color: white;
+            }
+            .product-image {
+                width: 100%;
+                border-radius: 5px;
+            }
+            .price {
+                font-size: 1.5rem;
+                font-weight: bold;
+            }
+            @media (max-width: 768px) {
+                .container {
+                    padding: 1rem;
+                }
+                .products-list {
+                    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                }
+                .product {
+                    height: auto;
+                    width: 280px;
+                }
+            }
+
+            .btn-buy {
+                background-color: white;
+                color: #6200ea;
+                padding: 0.5rem 1rem;
+                margin-left: 0.5rem;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: 0.3s;
+            }
+
+        `}</style>
+    </>
+}
+
+
+
+
 
 export const Logout = () => {
     const navigate = useNavigate()

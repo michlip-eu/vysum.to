@@ -684,3 +684,136 @@ export const AdminContact = () => {
         </div>
     </div>
 }
+
+export const AdminOrders = () => {
+    const [orders, setOrders] = useState([])
+    const stages = [
+        "Vyřizuje se",
+        "Potvrzeno",
+        "Odesláno",
+        "Doručeno"
+    ]
+    const buttons = [
+        "Potvrdit",
+        "Odeslat",
+        "Doručit"
+    ]
+    const urls = [
+        "/api/admin/orders/confirm/",
+        "/api/admin/orders/ship/",
+        "/api/admin/orders/deliver/"
+    ]
+    useEffect(() => {
+        fetch("/api/admin/orders").then(res => {
+            if (res.ok) return res.json()
+            throw new Error("Failed to fetch orders")
+        }).then(orders => {
+            setOrders(orders)
+            console.log(orders)
+        }).catch(console.error)
+    }, [])
+    const change = (id: number, stage: number) => {
+        fetch(urls[stage] + id, {
+            method: "PATCH",
+            credentials: "include"
+        }).then(res => {
+            if (res.ok) return toast.success("Objednávka byla změněna")
+            throw new Error("Failed to change order")
+        }).then(() => {
+            fetch("/api/admin/orders").then(res => {
+                if (res.ok) return res.json()
+                throw new Error("Failed to fetch orders")
+            }).then(orders => {
+                setOrders(orders)
+                console.log(orders)
+            }).catch(console.error)
+        }).catch(console.error)
+    }
+    return <div className="container">
+        <div className="top-group">
+            <h1>Objednávky</h1>
+        </div>
+        <div className="orders-list">
+            {orders.map((order: any) => (
+                <div className="order" key={order.id}>
+                    <h3>{order.name} {order.surname}</h3>
+                    <h3>{order.phone}</h3>
+                    <h3>{order.email}</h3>
+                    <p>{order.street}</p>
+                    <p>{order.city}</p>
+                    <p>{order.zip}</p>
+                    <p>{order.status}</p>
+                    <div className="items">
+                        {order.items.map((item: any) => (
+                            <div className="item" key={item.id}>
+                                <h3>{item.name}</h3>
+                                <p>{item.quantity}x {item.price.toFixed(2)} Kč</p>
+                            </div>
+                        ))}
+                    </div>
+                    {order.status !== "Doručeno" && <button className="btn-buy" onClick={() => change(order.id, stages.indexOf(order.status))}>{buttons[stages.indexOf(order.status)]}</button>}
+                </div>
+            ))}
+        </div>
+        <style>
+            {`
+        .orders-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .order {
+            padding: 1rem;
+            background-color: #e0e0e0;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .order h3 {
+            margin-bottom: 0.5rem;
+        }
+
+        .order p {
+            margin-bottom: 1rem;
+        }
+
+        .items {
+            margin-top: 1rem;
+            display: grid;
+            gap: 1rem;
+        }
+
+
+        .item {
+            padding: 0.5rem;
+            background-color: #ccc;
+            border-radius: 8px;
+        }
+
+        .item h3 {
+            margin-bottom: 0.5rem;
+        }
+
+        .item p {
+            margin-bottom: 0.5rem;
+        }
+
+        .btn-buy {
+            padding: 0.5rem 1rem;
+            background-color: #0056b3;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-buy:hover {
+            background-color: #003f7f;
+        }
+        `}
+        </style>
+    </div>
+}

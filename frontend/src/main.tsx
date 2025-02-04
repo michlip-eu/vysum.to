@@ -1,12 +1,12 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { App, Cart, Login, Logout, Navbar, Products, Register } from './newApp'
+import { App, Buy, Cart, Login, Logout, Navbar, OrderDetail, Orders, Products, Register } from './newApp'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { StoreProvider } from 'easy-peasy'
 import { store } from './store'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import { AdminOverlay, AdminMainPage, AdminProducts, AdminProductAdd, AdminProductEdit, AdminUsers, AdminContact } from './admin'
+import { AdminOverlay, AdminMainPage, AdminProducts, AdminProductAdd, AdminProductEdit, AdminUsers, AdminContact, AdminOrders } from './admin'
 import './index.css'
 
 
@@ -18,6 +18,10 @@ const routes = createBrowserRouter([
       {
         index: true,
         Component: AdminMainPage
+      },
+      {
+        path: "orders",
+        Component: AdminOrders
       },
       {
         path: "users",
@@ -46,6 +50,18 @@ const routes = createBrowserRouter([
   {
     path: "/login",
     element: <><Navbar /><Login /></>
+  },
+  {
+    path: "/buy",
+    element: <><Navbar /><Buy /></>
+  },
+  {
+    path: "/orders",
+    element: <><Navbar /><Orders /></>
+  },
+  {
+    path: "/order/*",
+    element: <><Navbar /><OrderDetail /></>
   },
   {
     path: "/register",
