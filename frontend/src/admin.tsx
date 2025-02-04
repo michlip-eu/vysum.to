@@ -811,8 +811,12 @@ export const AdminOrders = () => {
     </div>
 }
 
+interface AnyMore {
+    [key: string]: any
+}
+
 export const AdminOrderDetail = () => {
-    const [order, setOrder] = useState({})
+    const [order, setOrder] = useState<AnyMore>({})
     const [storage, setStorage] = useState(store.getState())
     store.subscribe(() => {
         setStorage(store.getState())
