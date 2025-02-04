@@ -44,6 +44,7 @@ export interface Product {
     price: number
     image: string
     mainPage: boolean
+    quantity: number
 }
 
 export const store = createStore<StoreModel>({
