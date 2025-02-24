@@ -172,11 +172,6 @@ app.get('/api/user/cart/clear', AuthMiddleWare, async (req: any, res: any) => {
 
 app.post('/api/user/cart/checkout', AuthMiddleWare, async (req: any, res: any) => {
     const user = req.data.user as UsersModel;
-    const { city, street, zip, phone, name, surname } = req.body;
-    if (!city || !street || !zip || !phone || !name || !surname) {
-        res.status(400).send('Město, ulice, PSČ, telefon, jméno a příjmení jsou povinné');
-        return;
-    }
     const conn = await db.getConnection();
     const cart: CartModel[] = await conn.query('SELECT * FROM cart WHERE user_id = ?', [user.id]).then((result) => {
         return result[0] as CartModel[];
@@ -187,7 +182,7 @@ app.post('/api/user/cart/checkout', AuthMiddleWare, async (req: any, res: any) =
         res.status(400).send('Košík je prázdný');
         return;
     }
-    await conn.query('INSERT INTO orders (user_id, city, street, zip, phone, name, surname) VALUES (?, ?, ?, ?, ?, ?, ?)', [user.id, city, street, zip, phone, name, surname]);
+    await conn.query('INSERT INTO orders (user_id) VALUES (?)', [user.id]);
     const order = await conn.query('SELECT LAST_INSERT_ID() as id').then((result: any) => {
         return result[0][0].id as number;
     }).catch(() => {
@@ -315,11 +310,10 @@ app.patch('/api/admin/orders/ship/:id', AuthMiddleWare, async (req: any, res: an
         return;
     }
     const conn = await db.getConnection();
-    await conn.query('UPDATE orders SET status = "Odesláno" WHERE id = ?', [id]);
+    await conn.query('UPDATE orders SET status = "Připraveno k vyzvednutí" WHERE id = ?', [id]);
     conn.release();
     res.send('Objednávka odeslána');
 });
-
 app.patch('/api/admin/orders/deliver/:id', AuthMiddleWare, async (req: any, res: any) => {
     const user = req.data.user as UsersModel;
     if (user.role !== 'admin') {
@@ -332,7 +326,7 @@ app.patch('/api/admin/orders/deliver/:id', AuthMiddleWare, async (req: any, res:
         return;
     }
     const conn = await db.getConnection();
-    await conn.query('UPDATE orders SET status = "Doručeno" WHERE id = ?', [id]);
+    await conn.query('UPDATE orders SET status = "Vyzvednuto" WHERE id = ?', [id]);
     conn.release();
     res.send('Objednávka doručena');
 });

@@ -1,6 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { App, Buy, Cart, Login, Logout, Navbar, OrderDetail, Orders, Products, Register } from './newApp'
+import { App, Cart, Login, Logout, Navbar, OrderDetail, Orders, Products, Register } from './newApp'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { StoreProvider } from 'easy-peasy'
 import { store } from './store'
@@ -54,10 +54,6 @@ const routes = createBrowserRouter([
   {
     path: "/login",
     element: <><Navbar /><Login /></>
-  },
-  {
-    path: "/buy",
-    element: <><Navbar /><Buy /></>
   },
   {
     path: "/orders",

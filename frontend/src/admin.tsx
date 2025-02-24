@@ -167,7 +167,7 @@ export const AdminProductAdd = () => {
             }).catch(console.error)
         }).catch(console.error)
     }
-    const fileChange = (e: any) => {
+    const fileChange = (e) => {
         const file = e.target.files[0]
         const reader = new FileReader()
         reader.onloadend = () => {
@@ -331,7 +331,7 @@ export const AdminProductEdit = () => {
             }).catch(console.error)
         }).catch(console.error)
     }
-    const fileChange = (e: any) => {
+    const fileChange = (e) => {
         const file = e.target.files[0]
         const reader = new FileReader()
         reader.onloadend = () => {
@@ -631,7 +631,7 @@ export const AdminContact = () => {
             }}>Smazat zprávy</button>
         </div>
         <div className="messages-list">
-            {messages.map((message: any) => (
+            {messages.map((message) => (
                 <div className="message" key={message.id}>
                     <h3>{message.name}</h3>
                     <h3>{message.email}</h3>
@@ -690,13 +690,13 @@ export const AdminOrders = () => {
     const stages = [
         "Vyřizuje se",
         "Potvrzeno",
-        "Odesláno",
-        "Doručeno"
+        "Připraveno k vyzvednutí",
+        "Vyzvednuto"
     ]
     const buttons = [
         "Potvrdit",
-        "Odeslat",
-        "Doručit"
+        "Připravit k vyzvednutí",
+        "Označit jako Vyzvednuté"
     ]
     const urls = [
         "/api/admin/orders/confirm/",
@@ -734,17 +734,12 @@ export const AdminOrders = () => {
             <h1>Objednávky</h1>
         </div>
         <div className="orders-list">
-            {orders.map((order: any) => (
+            {orders.map((order) => (
                 <div className="order" key={order.id}>
-                    <h3>{order.name} {order.surname}</h3>
-                    <h3>{order.phone}</h3>
-                    <h3>{order.email}</h3>
-                    <p>{order.street}</p>
-                    <p>{order.city}</p>
-                    <p>{order.zip}</p>
+                    <p>Obědnávka č.{order.id}</p>
                     <p>{order.status}</p>
                     <Link to={`/admin/order/${order.id}`} className="btn-buy">Detail</Link>
-                    {order.status !== "Doručeno" && <button className="btn-buy" onClick={() => change(order.id, stages.indexOf(order.status))}>{buttons[stages.indexOf(order.status)]}</button>}
+                    {order.status !== "Vyzvednuto" && <button className="btn-buy" onClick={() => change(order.id, stages.indexOf(order.status))}>{buttons[stages.indexOf(order.status)]}</button>}
                 </div>
             ))}
         </div>
@@ -821,55 +816,22 @@ export const AdminOrderDetail = () => {
     store.subscribe(() => {
         setStorage(store.getState())
     })
-    const stages = [
-        "Vyřizuje se",
-        "Potvrzeno",
-        "Odesláno",
-        "Doručeno"
-    ]
-    const buttons = [
-        "Potvrdit",
-        "Odeslat",
-        "Doručit"
-    ]
-    const urls = [
-        "/api/admin/orders/confirm/",
-        "/api/admin/orders/ship/",
-        "/api/admin/orders/deliver/"
-    ]
     useEffect(() => {
         const id = parseInt(window.location.pathname.split("/").pop() as string)
         fetch(`/api/admin/orders`).then(res => {
             if (res.ok) return res.json()
             throw new Error("Failed to fetch order")
         }).then(order => {
-            setOrder(order.find((o: any) => o.id === id))
+            setOrder(order.find((o) => o.id === id))
             console.log(order)
         }).catch(console.error)
     }, [])
-    const change = (id: number, stage: number) => {
-        fetch(urls[stage] + id, {
-            method: "PATCH",
-            credentials: "include"
-        }).then(res => {
-            if (res.ok) return toast.success("Objednávka byla změněna")
-            throw new Error("Failed to change order")
-        }).then(() => {
-            fetch(`/api/admin/order/${id}`).then(res => {
-                if (res.ok) return res.json()
-                throw new Error("Failed to fetch order")
-            }).then(order => {
-                setOrder(order)
-                console.log(order)
-            }).catch(console.error)
-        }).catch(console.error)
-    }
     return <div className="container">
         <div className="top-group">
             <h1>Detail objednávky</h1>
         </div>
         <div className="products-list">
-            {order.items && order.items.map((item: any) => (
+            {order.items && order.items.map((item) => (
                 <div className="product" key={item.id}>
                     <img src={item.image} alt={item.name} className="product-image" />
                     <div className="product-content">

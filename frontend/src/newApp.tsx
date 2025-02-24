@@ -487,6 +487,7 @@ export const Register = () => {
 }
 
 export const Cart = () => {
+    const navigate = useNavigate()
     const [storage, setStorage] = useState(store.getState())
     store.subscribe(() => {
         setStorage(store.getState())
@@ -539,6 +540,23 @@ export const Cart = () => {
             store.getActions().setUser(user)
         }).catch(console.error)
     }
+    const buy = () => {
+        fetch("/api/user/cart/checkout", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            credentials: "include"
+        }).then(res => {
+            if (res.ok) {
+                toast.success("Objednávka proběhla úspěšně")
+                navigate("/orders")
+                return;
+            }
+            toast.error("Objednávka se nezdařila")
+            throw new Error("Failed to buy")
+        });
+    }
     if (!storage.user) return <App />
     return <>
         <div className="container">
@@ -561,7 +579,7 @@ export const Cart = () => {
             </div>
             <p style={{ textAlign: "right", fontSize: "1.5rem", fontWeight: "bold", color: "white" }}>Celkem: {storage.user?.items.reduce((acc, item) => acc + item.price * item.quantity, 0).toFixed(2)} Kč</p>
             <button className="btn-buy" onClick={clearCart}><i className="fas fa-trash"></i> Vyprázdnit košík</button>
-            <Link to="/buy" className="btn-buy"><i className="fas fa-shopping-cart"></i> Pokračovat k platbě</Link>
+            <button onClick={buy} className="btn-buy"><i className="fas fa-shopping-cart"></i> Pokračovat k platbě</button>
         </div>
         <style>{`
             .container {
@@ -631,125 +649,6 @@ export const Cart = () => {
     </>
 }
 
-export const Buy = () => {
-    const navigate = useNavigate()
-    const [storage, setStorage] = useState(store.getState())
-    const [name, setName] = useState("")
-    const [surname, setSurname] = useState("")
-    const [phone, setPhone] = useState("")
-    const [street, setStreet] = useState("")
-    const [city, setCity] = useState("")
-    const [zip, setZip] = useState("")
-    const [error, setError] = useState("")
-    const [loading, setLoading] = useState(false)
-    store.subscribe(() => {
-        setStorage(store.getState())
-    })
-    const buy = () => {
-        setLoading(true)
-        fetch("/api/user/cart/checkout", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ name, surname, phone, street, city, zip }),
-            credentials: "include"
-        }).then(res => {
-            if (res.ok) {
-                toast.success("Objednávka proběhla úspěšně")
-                navigate("/orders")
-                return;
-            }
-            toast.error("Objednávka se nezdařila")
-            throw new Error("Failed to buy")
-        }).catch((err) => setError(err.message))
-            .finally(() => setLoading(false))
-    }
-    if (!storage.user) return <App />
-    return <>
-        <div className="container">
-            <form onSubmit={e => { e.preventDefault(); buy() }}>
-                <h1>Objednávka</h1>
-                <div className="form-group">
-                    <label htmlFor="name">Jméno:</label>
-                    <input type="text" id="name" value={name} onChange={e => setName(e.target.value)} />
-                </div>
-                <div className="form-group">
-                    <label htmlFor="surname">Příjmení:</label>
-                    <input type="text" id="surname" value={surname} onChange={e => setSurname(e.target.value)} />
-                </div>
-                <div className="form-group">
-                    <label htmlFor="phone">Telefon:</label>
-                    <input type="text" id="phone" value={phone} onChange={e => setPhone(e.target.value)} />
-                </div>
-                <div className="form-group">
-                    <label htmlFor="street">Ulice:</label>
-                    <input type="text" id="street" value={street} onChange={e => setStreet(e.target.value)} />
-                </div>
-                <div className="form-group">
-                    <label htmlFor="city">Město:</label>
-                    <input type="text" id="city" value={city} onChange={e => setCity(e.target.value)} />
-                </div>
-                <div className="form-group">
-                    <label htmlFor="zip">PSČ:</label>
-                    <input type="text" id="zip" value={zip} onChange={e => setZip(e.target.value)} />
-                </div>
-                <button type="submit" disabled={loading}>{loading ? "Probíhá objednávka..." : "Objednat"}</button>
-                {error && <p style={{ color: "red" }}>{error}</p>}
-            </form>
-        </div>
-        <style>{`
-            .container {
-                padding: 2rem;
-                width: 100%;
-                height: 100%;
-                display: flex;
-                justify-content: center;
-                align-items: center
-
-            }
-            form {
-                display: flex;
-                flex-direction: column;
-                gap: 1rem;
-                width: 100%;
-                max-width: 300px;
-                background-color: white;
-                padding: 2rem;
-                border-radius: 5px;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            }
-            form h1 {
-                text-align: center;
-            }
-            .form-group {
-                display: flex;
-                flex-direction: column;
-            }
-            label {
-                font-weight: bold;
-            }
-            input, button, textarea {
-                padding: 0.5rem;
-                border-radius: 5px;
-                border: 1px solid #6200ea;
-            }
-            button {
-                background-color: #6200ea;
-                color: white;
-                border: none;
-                cursor: pointer;
-            }
-            button:disabled {
-                color: #666;
-                cursor: not-allowed;
-            }
-                p {
-                    text-align: center;
-                }
-        `}</style>
-    </>
-};
 
 export const Orders = () => {
     const navigate = useNavigate()
@@ -776,12 +675,6 @@ export const Orders = () => {
                     <div className="product" key={order.id}>
                         <div className="product-content">
                             <h3>Objednávka č. {order.id}</h3>
-                            <p>Jméno: {order.name}</p>
-                            <p>Příjmení: {order.surname}</p>
-                            <p>Telefon: {order.phone}</p>
-                            <p>Ulice: {order.street}</p>
-                            <p>Město: {order.city}</p>
-                            <p>PSČ: {order.zip}</p>
                             <p>Celkem: {order.items.reduce((acc, item) => acc + item.price * item.quantity, 0).toFixed(2)} Kč</p>
                             <p>Stav: {order.status}</p>
                             <div style={{ display: "flex", justifyContent: "space-between" }}>

@@ -80,6 +80,11 @@ class db {
                 process.exit(1);
             }
         });
+        setInterval(() => {
+            db.simpleQuery.query('SELECT 1').catch(err => {
+                if (err) process.exit(1);
+            });
+        }, 5000);
     }
     public static async getConnection() {
         console.debug('Getting connection');
