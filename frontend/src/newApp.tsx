@@ -4,11 +4,16 @@ import { store, Product, User, Order } from "./store"
 import { toast } from "react-toastify"
 
 
-import JanPoricky from './assets/janporicky.png';
-import FilipDvorak from './assets/filipdvorak.png';
-import JiriKratky from './assets/jirikratky.png';
-import KikcaBartosikova from './assets/kikcabartosikova.png';
-import RadekDohnal from './assets/radekdohnal.png';
+// import JanPoricky from './assets/janporicky.png';
+// import FilipDvorak from './assets/filipdvorak.png';
+// import JiriKratky from './assets/jirikratky.png';
+// import KikcaBartosikova from './assets/kikcabartosikova.png';
+// import RadekDohnal from './assets/radekdohnal.png';
+const JanPoricky = "",
+    FilipDvorak = "",
+    JiriKratky = "",
+    KikcaBartosikova = "",
+    RadekDohnal = ""
 
 export const Navbar = () => {
     const [storage, setStorage] = useState(store.getState())
