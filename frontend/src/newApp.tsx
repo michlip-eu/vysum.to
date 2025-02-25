@@ -4,6 +4,12 @@ import { store, Product, User, Order } from "./store"
 import { toast } from "react-toastify"
 
 
+import JanPoricky from './assets/janporicky.png';
+import FilipDvorak from './assets/filipdvorak.png';
+import JiriKratky from './assets/jirikratky.png';
+import KikcaBartosikova from './assets/kikcabartosikova.png';
+import RadekDohnal from './assets/radekdohnal.png';
+
 export const Navbar = () => {
     const [storage, setStorage] = useState(store.getState())
     store.subscribe(() => {
@@ -155,16 +161,29 @@ export const App = () => {
             <h2>Náš Tým</h2>
             <div className="team-members">
                 <div className="team-member">
-                    <img src="https://michlip.eu/favicon.png" alt="Jan Novák" />
-                    <h3>Jan Novák</h3>
+                    <img src={JanPoricky} alt="Člen Týmu 1" />
+                    <h4>Jan Pořický</h4>
+                    <p>Zakladatel a CEO</p>
                 </div>
                 <div className="team-member">
-                    <img src="https://michlip.eu/favicon.png" alt="Petra Svobodová" />
-                    <h3>Petra Svobodová</h3>
+                    <img src={FilipDvorak} alt="Člen Týmu 2" />
+                    <h4>Filip Dvořák</h4>
+                    <p>Společníka a výrobce</p>
                 </div>
                 <div className="team-member">
-                    <img src="https://michlip.eu/favicon.png" alt="Martin Dvořák" />
-                    <h3>Martin Dvořák</h3>
+                    <img src={JiriKratky} alt="Člen Týmu 3" />
+                    <h4>Jiří Krátký</h4>
+                    <p>Marketingový poradce</p>
+                </div>
+                <div className="team-member">
+                    <img src={KikcaBartosikova} alt="Člen Týmu 4" />
+                    <h4>Kristýna Bartošíková</h4>
+                    <p>Designérka a marketingová poradkyně</p>
+                </div>
+                <div className="team-member">
+                    <img src={RadekDohnal} alt="Člen Týmu 5" />
+                    <h4>Radek Dohnal</h4>
+                    <p>Marketingový poradce</p>
                 </div>
             </div>
         </div>
