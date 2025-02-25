@@ -5,9 +5,11 @@ import Sumivka2 from './assets/sumivka2.png';
 import Sumivka3 from './assets/sumivka3.png';
 import OnasImage from './assets/onas.png';
 
-import JanNovak from './assets/janNovak.png';
-import PetraSvobodova from './assets/PetraSvobodova.png';
-import MartinDvorak from './assets/onas.png';
+import JanPoricky from './assets/janporicky.png';
+import FilipDvorak from './assets/filipdvorak.png';
+import JiriKratky from './assets/jirikratky.png';
+import KikcaBartosikova from './assets/kikcabartosikova.png';
+import RadekDohnal from './assets/radekdohnal.png';
 
 function App() {
     const sectionsRef = useRef<(HTMLElement | null)[]>([]);
@@ -87,19 +89,29 @@ function App() {
                     <h3 style={{ color: "white" }}>Náš Tým</h3>
                     <div className="team-members">
                         <div className="team-member">
-                            <img src={JanNovak} alt="Člen Týmu 1" />
-                            <h4>Jan Novák</h4>
-                            <p>Zakladatel & CEO</p>
+                            <img src={JanPoricky} alt="Člen Týmu 1" />
+                            <h4>Jan Pořický</h4>
+                            <p>Zakladatel a CEO</p>
                         </div>
                         <div className="team-member">
-                            <img src={PetraSvobodova} alt="Člen Týmu 2" />
-                            <h4>Petra Svobodová</h4>
-                            <p>Marketingová Manažerka</p>
+                            <img src={FilipDvorak} alt="Člen Týmu 2" />
+                            <h4>Filip Dvořák</h4>
+                            <p>Společníka a výrobce</p>
                         </div>
                         <div className="team-member">
-                            <img src={MartinDvorak} alt="Člen Týmu 3" />
-                            <h4>Martin Dvořák</h4>
-                            <p>Vývojář Produktů</p>
+                            <img src={JiriKratky} alt="Člen Týmu 3" />
+                            <h4>Jiří Krátký</h4>
+                            <p>Marketingový poradce</p>
+                        </div>
+                        <div className="team-member">
+                            <img src={KikcaBartosikova} alt="Člen Týmu 4" />
+                            <h4>Kristýna Bartošíková</h4>
+                            <p>Designérka a marketingová poradkyně</p>
+                        </div>
+                        <div className="team-member">
+                            <img src={RadekDohnal} alt="Člen Týmu 5" />
+                            <h4>Radek Dohnal</h4>
+                            <p>Marketingový poradce</p>
                         </div>
                     </div>
                 </div>
@@ -110,8 +122,8 @@ function App() {
                 <p>Máte nějaké otázky nebo potřebujete více informací? Kontaktujte nás:</p>
                 <ul>
                     <li><i className="fas fa-envelope"></i> Email: info@vysum.to</li>
-                    <li><i className="fas fa-phone-alt"></i> Telefon: +420 123 456 789</li>
-                    <li><i className="fas fa-map-marker-alt"></i> Adresa: Ulice 123, Město, Česká republika</li>
+                    <li><i className="fas fa-phone-alt"></i> Telefon: +420 731 822 130</li>
+                    <li><i className="fas fa-map-marker-alt"></i> Adresa: Náměstí Komenského 945/4, 669 02 Znojmo, Česká republika</li>
                 </ul>
                 {/* Add Contact Form */}
                 <form className="contact-form">
