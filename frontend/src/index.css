@@ -68,6 +68,8 @@
 .team-members {
 	display: flex;
 	gap: 2rem;
+	flex-wrap: wrap;
+	justify-content: center;
 }
 .team-member {
 	text-align: center;
@@ -123,9 +125,6 @@
 	.product {
 		height: auto;
 		width: 280px;
-	}
-	.team-members {
-		flex-direction: column;
 	}
 	.contact-form {
 		padding: 1rem;

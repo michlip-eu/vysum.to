@@ -9,11 +9,11 @@ import { toast } from "react-toastify"
 // import JiriKratky from './assets/jirikratky.png';
 // import KikcaBartosikova from './assets/kikcabartosikova.png';
 // import RadekDohnal from './assets/radekdohnal.png';
-const JanPoricky = "",
-    FilipDvorak = "",
-    JiriKratky = "",
-    KikcaBartosikova = "",
-    RadekDohnal = ""
+const JanPoricky = "/favicon.png",
+    FilipDvorak = "/favicon.png",
+    JiriKratky = "/favicon.png",
+    KikcaBartosikova = "/favicon.png",
+    RadekDohnal = "/favicon.png"
 
 export const Navbar = () => {
     const [storage, setStorage] = useState(store.getState())
