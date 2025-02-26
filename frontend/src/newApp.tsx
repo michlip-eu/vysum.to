@@ -173,7 +173,7 @@ export const App = () => {
                 <div className="team-member">
                     <img src={FilipDvorak} alt="Člen Týmu 2" />
                     <h4>Filip Dvořák</h4>
-                    <p>Společníka a výrobce</p>
+                    <p>Společník a výrobce</p>
                 </div>
                 <div className="team-member">
                     <img src={JiriKratky} alt="Člen Týmu 3" />
@@ -188,7 +188,7 @@ export const App = () => {
                 <div className="team-member">
                     <img src={RadekDohnal} alt="Člen Týmu 5" />
                     <h4>Radek Dohnal</h4>
-                    <p>Marketingový poradce</p>
+                    <p>Uklízečka (novinka)</p>
                 </div>
             </div>
         </div>
