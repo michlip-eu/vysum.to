@@ -544,8 +544,7 @@ export const AdminUsers = () => {
             {users.map((user: User) => (
                 <div className="user" key={user.id}>
                     <h3>{user.email}</h3>
-                    <p>{user.firstname}</p>
-                    <p>{user.surname}</p>
+                    <p>{user.firstname} {user.surname}</p>
 
                     <p>{user.role}</p>
                     {
@@ -740,9 +739,8 @@ export const AdminOrders = () => {
             {orders.map((order) => (
                 <div className="order" key={order.id}>
                     <p>Obědnávka č.{order.id}</p>
-                    <p>{order.firstname}</p>
-                    <p>{order.surname}</p>
                     <p>{order.email}</p>
+                    <p>{order.firstname} {order.surname}</p>
                     <p>{order.status}</p>
                     <Link to={`/admin/order/${order.id}`} className="btn-buy">Detail</Link>
                     {order.status !== "Vyzvednuto" && <button className="btn-buy" onClick={() => change(order.id, stages.indexOf(order.status))}>{buttons[stages.indexOf(order.status)]}</button>}
