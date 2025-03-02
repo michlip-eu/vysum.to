@@ -737,6 +737,9 @@ export const AdminOrders = () => {
             {orders.map((order) => (
                 <div className="order" key={order.id}>
                     <p>Obědnávka č.{order.id}</p>
+                    <p>{order.firstname}</p>
+                    <p>{order.surname}</p>
+                    <p>{order.email}</p>
                     <p>{order.status}</p>
                     <Link to={`/admin/order/${order.id}`} className="btn-buy">Detail</Link>
                     {order.status !== "Vyzvednuto" && <button className="btn-buy" onClick={() => change(order.id, stages.indexOf(order.status))}>{buttons[stages.indexOf(order.status)]}</button>}

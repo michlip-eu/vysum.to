@@ -37,14 +37,14 @@ app.use((req: any, res: any, next: any) => {
 });
 
 app.post('/api/user/register', async (req: any, res: any) => {
-    const { email, password } = req.body;
-    if (!email || !password) {
-        res.status(400).send('Email a heslo jsou povinné');
+    const { firstname, surname, email, password } = req.body;
+    if (!firstname || !surname || !email || !password) {
+        res.status(400).send('Jméno, Přijmení, Email a heslo jsou povinné');
         return;
     }
     const hashedPassword = await PasswordSecurity.hash(password);
     const conn = await db.getConnection();
-    await conn.query('INSERT INTO users (email, password) VALUES (?, ?)', [email, hashedPassword]).catch((e) => {
+    await conn.query('INSERT INTO users (firstname, surname, email, password) VALUES (?, ?, ?, ?)', [email, hashedPassword]).catch((e) => {
         console.log(e);
         res.status(400).send('Uživatel již existuje');
         return
@@ -228,8 +228,8 @@ app.get('/api/admin/orders', AuthMiddleWare, async (req: any, res: any) => {
         return;
     }
     const conn = await db.getConnection();
-    const orders = await conn.query('SELECT * FROM orders').then((result) => {
-        return result[0] as { id: number, city: string, street: string, zip: string, phone: string, name: string, surname: string, order_id: string, items: ItemsModel[] }[];
+    const orders = await conn.query('SELECT o.*, u.firstname, u.surname, u.email FROM orders o JOIN users u ON o.user_id = u.id').then((result) => {
+        return result[0] as { id: number, city: string, street: string, zip: string, phone: string, firstname: string, surname: string, order_id: string, items: ItemsModel[] }[];
     }).catch(() => {
         return [];
     });

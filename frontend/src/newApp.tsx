@@ -300,6 +300,8 @@ export const Products = () => {
 
 export const Login = () => {
     const navigate = useNavigate()
+    const [firstname, setFirstname] = useState("")
+    const [surname, setSurname] = useState("")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [error, setError] = useState("")
@@ -311,7 +313,7 @@ export const Login = () => {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ email, password }),
+            body: JSON.stringify({ firstname, surname, email, password }),
             credentials: "include"
         }).then(async (res) => {
             if (res.ok) {
@@ -338,6 +340,15 @@ export const Login = () => {
         <div className="container">
             <form onSubmit={e => { e.preventDefault(); login() }}>
                 <h1>Přihlášení</h1>
+                <div className="form-group">
+                    <label htmlFor="email">Jméno:</label>
+                    <input type="text" id="firstname" value={email} onChange={e => setFirstname(e.target.value)} />
+                </div>
+                <div className="form-group">
+                    <label htmlFor="email">Příjmení:</label>
+                    <input type="text" id="surname" value={email} onChange={e => setSurname(e.target.value)} />
+                </div>
+
                 <div className="form-group">
                     <label htmlFor="email">Email:</label>
                     <input type="email" id="email" value={email} onChange={e => setEmail(e.target.value)} />

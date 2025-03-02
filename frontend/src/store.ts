@@ -5,10 +5,15 @@ export interface Order {
     items: Product[]
     status: string
     user_id: number
+    fistname: string
+    surname: string
+    email: string
 }
 
 export interface User {
     id: number
+    firstname: string
+    surname: string
     name: string
     email: string
     role: string
