@@ -544,6 +544,9 @@ export const AdminUsers = () => {
             {users.map((user: User) => (
                 <div className="user" key={user.id}>
                     <h3>{user.email}</h3>
+                    <p>{user.firstname}</p>
+                    <p>{user.surname}</p>
+
                     <p>{user.role}</p>
                     {
                         user.role === "admin" ? <button className="btn-buy" onClick={() => degradeUser(user.id)} disabled={user.id === storage.user?.id || user.email === "admin@vysum.to"}>Degradovat</button> : <button onClick={() => promoteUser(user.id)} className="btn-buy">Povýšit</button>
