@@ -44,7 +44,7 @@ app.post('/api/user/register', async (req: any, res: any) => {
     }
     const hashedPassword = await PasswordSecurity.hash(password);
     const conn = await db.getConnection();
-    await conn.query('INSERT INTO users (firstname, surname, email, password) VALUES (?, ?, ?, ?)', [email, hashedPassword]).catch((e) => {
+    await conn.query('INSERT INTO users (firstname, surname, email, password) VALUES (?, ?, ?, ?)', [firstname, surname, email, hashedPassword]).catch((e) => {
         console.log(e);
         res.status(400).send('Uživatel již existuje');
         return
