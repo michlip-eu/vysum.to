@@ -160,7 +160,7 @@ export const App = () => {
         </div>
         <div className="hero" id="about">
             <h2>O Nás</h2>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quae?</p>
+            <p><i>*připravujeme*</i></p>
         </div>
         <div className="hero" id="team">
             <h2>Náš Tým</h2>
