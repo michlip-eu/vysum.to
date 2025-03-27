@@ -196,8 +196,8 @@ export const App = () => {
             <h2>Kontakt</h2>
             <p>Máte nějaké otázky nebo potřebujete více informací? Kontaktujte nás:</p>
             <ul>
-                <li><i className="fas fa-envelope"></i> Email: info@vysum.to</li>
-                <li><i className="fas fa-phone-alt"></i> Telefon: +420 731 822 130</li>
+                <li><i className="fas fa-envelope"></i> Email: <a href="mailto:info@vysum.to">info@vysum.to</a></li>
+                <li><i className="fas fa-phone-alt"></i> Telefon: <a href="tel:+420731822130">+420 731 822 130</a></li>
                 <li><i className="fas fa-map-marker-alt"></i> Adresa: Náměstí Komenského 945/4, 669 02 Znojmo, Česká republika</li>
             </ul>
             <form className="contact-form" style={{ width: "95%", maxWidth: "600px", margin: "auto" }} onSubmit={e => { e.preventDefault(); postMessage() }}>
