@@ -33,8 +33,8 @@ importers:
         specifier: ^3.11.3
         version: 3.12.0
       nodemailer:
-        specifier: ^6.9.16
-        version: 6.9.16
+        specifier: ^7.0.11
+        version: 7.0.11
     devDependencies:
       '@types/bcryptjs':
         specifier: ^2.4.6
@@ -499,8 +499,8 @@ packages:
     resolution: {integrity: sha512-+EUsqGPLsM+j/zdChZjsnX51g4XrHFOIXwfnCVPGlQk/k5giakcKsuxCObBRu6DSm9opw/O6slWbJdghQM4bBg==}
     engines: {node: '>= 0.6'}
 
-  nodemailer@6.9.16:
-    resolution: {integrity: sha512-psAuZdTIRN08HKVd/E8ObdV6NO7NTBY3KsC30F7M4H1OnmLCUNaS56FpYxyb26zWLSyYF9Ozch9KYHhHegsiOQ==}
+  nodemailer@7.0.11:
+    resolution: {integrity: sha512-gnXhNRE0FNhD7wPSCGhdNh46Hs6nm+uTyg+Kq0cZukNQiYdnCsoQjodNP9BQVG9XrcK/v6/MgpAPBUFyzh9pvw==}
     engines: {node: '>=6.0.0'}
 
   normalize-path@3.0.0:
@@ -1129,7 +1129,7 @@ snapshots:
 
   negotiator@0.6.3: {}
 
-  nodemailer@6.9.16: {}
+  nodemailer@7.0.11: {}
 
   normalize-path@3.0.0: {}
 
